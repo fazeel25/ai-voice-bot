@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: voxa-ai-voice-bot
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: OPENAI_API_KEY
+        sync: false

@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#07111f" />
+    <meta name="description" content="A multilingual AI voice assistant demo for cafes, restaurants, real estate and small businesses." />
+    <link rel="icon" href="icon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <title>Voxa — AI Voice Bot</title>
+  </head>
+  <body>
+    <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <a class="brand" href="#" aria-label="Voxa home"><span class="brand-mark">V</span><span>VOXA<small>VOICE OPERATING AGENT</small></span></a>
+        <nav aria-label="Main navigation">
+          <a class="nav-item active" href="#studio"><span>◈</span>Live Studio</a>
+          <a class="nav-item" href="#knowledge"><span>⌘</span>Knowledge</a>
+          <a class="nav-item" href="#insights"><span>◎</span>Insights</a>
+        </nav>
+        <div class="sidebar-card"><span class="live-dot"></span><strong>Demo ready</strong><p>Works without an API key. Connect OpenAI and Twilio when you are ready.</p></div>
+        <p class="sidebar-foot">Private-by-design starter<br />Built for real businesses</p>
+      </aside>
+
+      <main>
+        <header class="topbar">
+          <div><p class="eyebrow">AI RECEPTIONIST / LIVE</p><h1>Voice command center</h1></div>
+          <div class="top-actions"><button class="icon-button" id="themeButton" aria-label="Toggle theme">◐</button><button class="export-button" id="exportButton">Export transcript</button></div>
+        </header>
+
+        <section class="control-strip" id="studio">
+          <label><span>Business profile</span><select id="businessSelect"><option value="cafe">Northstar Café</option><option value="restaurant">Saffron Table</option><option value="realestate">Vertex Homes</option></select></label>
+          <label><span>Assistant language</span><select id="languageSelect"><option value="en-US">English</option><option value="ur-PK">Urdu / Roman Urdu</option></select></label>
+          <div class="connection"><span class="live-dot"></span><div><small>VOICE ENGINE</small><strong id="engineStatus">Browser ready</strong></div></div>
+        </section>
+
+        <section class="workspace-grid">
+          <article class="conversation-panel">
+            <div class="panel-head"><div><p class="eyebrow">LIVE CONVERSATION</p><h2 id="businessTitle">Northstar Café</h2></div><span class="session-pill" id="sessionTime">00:00</span></div>
+            <div class="conversation" id="conversation" aria-live="polite">
+              <div class="message assistant"><span>VOXA</span><p>Hello! I’m ready to answer calls, qualify leads and book appointments. Try the microphone or type a message.</p></div>
+            </div>
+            <div class="quick-prompts" id="quickPrompts"><button>What time do you close?</button><button>Can I book a table?</button><button>Where are you located?</button></div>
+            <form class="composer" id="composer">
+              <button class="mic-button" id="micButton" type="button" aria-label="Start voice input"><span class="mic-core">●</span><span class="mic-ring"></span></button>
+              <input id="messageInput" maxlength="800" placeholder="Speak or type a customer question…" autocomplete="off" />
+              <button class="send-button" type="submit">Send ↗</button>
+            </form>
+            <p class="voice-note" id="voiceNote">Microphone support depends on your browser. Text mode always works.</p>
+          </article>
+
+          <aside class="right-rail">
+            <section class="metric-card" id="insights"><div><p>Conversations</p><strong id="conversationCount">0</strong></div><span class="metric-icon">↗</span></section>
+            <section class="intent-card"><p class="eyebrow">LIVE INTENT</p><strong id="intentValue">Waiting</strong><div class="confidence"><span id="confidenceBar"></span></div><small id="sourceValue">Local intelligence</small></section>
+            <section class="knowledge-card" id="knowledge"><div class="panel-head compact"><div><p class="eyebrow">KNOWLEDGE</p><h3>Verified facts</h3></div><span id="factCount">8</span></div><ul id="knowledgeList"><li>Business hours</li><li>Location and contact</li><li>Services and prices</li><li>Booking flow</li></ul></section>
+            <section class="privacy-card"><span>⌁</span><div><strong>Safe demo mode</strong><p>No recordings are stored. Add your own privacy policy before production calls.</p></div></section>
+          </aside>
+        </section>
+      </main>
+    </div>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
