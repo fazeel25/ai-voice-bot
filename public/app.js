@@ -10,27 +10,38 @@ const localAnswers = {
   realestate: ['Tell me your preferred area, budget and number of bedrooms and I will qualify the request.', 'Vertex Homes is open Monday to Saturday, 9 AM to 7 PM.', 'Share your area, budget and preferred time and an agent will confirm a viewing.']
 };
 
-const state = { businessId: 'cafe', language: 'en-US', count: 0, messages: [], startedAt: Date.now(), listening: false };
+const state = { businessId: 'cafe', language: 'en-US', count: 0, messages: [], startedAt: Date.now(), listening: false, lastAnswer: '' };
 const conversation = document.querySelector('#conversation');
 const composer = document.querySelector('#composer');
 const input = document.querySelector('#messageInput');
 const micButton = document.querySelector('#micButton');
+const startCallButton = document.querySelector('#startCallButton');
+const callStatus = document.querySelector('#callStatus');
 const voiceNote = document.querySelector('#voiceNote');
 const quickPrompts = document.querySelector('#quickPrompts');
+const repeatButton = document.querySelector('#repeatButton');
+const engineStatus = document.querySelector('#engineStatus');
 
 function escapeHtml(value) { const element = document.createElement('div'); element.textContent = value; return element.innerHTML; }
 
+function setStatus(label, active) {
+  callStatus.querySelector('strong').textContent = label;
+  callStatus.classList.toggle('active', Boolean(active));
+  startCallButton.classList.toggle('listening', label === 'Listening…');
+  document.querySelector('#intentValue').textContent = label.replace('…', '');
+}
+
 function addMessage(role, text) {
-  const label = role === 'assistant' ? 'VOXA' : 'CUSTOMER';
-  conversation.insertAdjacentHTML('beforeend', `<div class="message ${role}"><span>${label}</span><p>${escapeHtml(text)}</p></div>`);
+  const label = role === 'assistant' ? 'VOXA' : 'YOU';
+  conversation.insertAdjacentHTML('beforeend', '<div class="message ' + role + '"><span>' + label + '</span><p>' + escapeHtml(text) + '</p></div>');
   conversation.scrollTop = conversation.scrollHeight;
   state.messages.push({ role, text, timestamp: new Date().toISOString() });
 }
 
 function updateIntent(intent = 'general', source = 'local-engine') {
   document.querySelector('#intentValue').textContent = intent.replace('-', ' ');
-  document.querySelector('#confidenceBar').style.width = `${intent === 'general' ? 64 : 92}%`;
-  document.querySelector('#sourceValue').textContent = source === 'openai' ? 'OpenAI intelligence' : 'Local intelligence';
+  document.querySelector('#confidenceBar').style.width = intent === 'general' ? '64%' : '92%';
+  document.querySelector('#sourceValue').textContent = source === 'openai' ? 'Answered with connected AI' : 'Answered with demo knowledge';
 }
 
 function localReply(message) {
@@ -43,47 +54,108 @@ function localReply(message) {
 }
 
 async function ask(message) {
+  if (!message) return;
   addMessage('user', message);
   input.value = '';
-  document.querySelector('#intentValue').textContent = 'Thinking';
-  document.querySelector('#intentValue').classList.add('loading');
+  setStatus('Thinking…', true);
   let data;
   try {
     const response = await fetch('api/respond', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message, businessId: state.businessId }) });
     if (!response.ok) throw new Error('Demo API unavailable');
     data = await response.json();
-  } catch { data = localReply(message); }
-  document.querySelector('#intentValue').classList.remove('loading');
+  } catch {
+    data = localReply(message);
+  }
   addMessage('assistant', data.text);
+  state.lastAnswer = data.text;
+  repeatButton.disabled = false;
   state.count += 1;
   document.querySelector('#conversationCount').textContent = state.count;
   updateIntent(data.intent, data.source);
+  setStatus('Speaking…', true);
   speak(data.text);
 }
 
+function chooseVoice() {
+  const voices = speechSynthesis.getVoices();
+  const exact = voices.find((voice) => voice.lang === state.language);
+  const languageFamily = voices.find((voice) => voice.lang.toLowerCase().startsWith(state.language.slice(0, 2).toLowerCase()));
+  return exact || languageFamily || voices.find((voice) => /female|zira|samantha|google uk english female/i.test(voice.name)) || voices[0];
+}
+
 function speak(text) {
-  if (!('speechSynthesis' in window)) return;
+  if (!('speechSynthesis' in window)) {
+    setStatus('Answer ready', false);
+    voiceNote.textContent = 'Audio playback is unavailable in this browser. Read the answer above.';
+    return;
+  }
   speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = state.language;
-  utterance.rate = 1.02;
+  utterance.rate = state.language === 'ur-PK' ? 0.9 : 0.96;
+  utterance.pitch = 1;
+  const voice = chooseVoice();
+  if (voice) utterance.voice = voice;
+  utterance.onend = () => { setStatus('Ready for another question', false); };
+  utterance.onerror = () => { setStatus('Answer ready', false); };
   speechSynthesis.speak(utterance);
 }
 
 const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const recognition = Recognition ? new Recognition() : null;
+
+function startListening() {
+  if (!recognition) {
+    input.focus();
+    setStatus('Type your question below', false);
+    voiceNote.textContent = 'Voice input is not supported here. Type a question and press Send.';
+    return;
+  }
+  try {
+    speechSynthesis.cancel();
+    recognition.lang = state.language;
+    recognition.start();
+    state.listening = true;
+    micButton.classList.add('listening');
+    setStatus('Listening…', true);
+    voiceNote.textContent = 'Speak now. Voxa will show the words it hears.';
+    startCallButton.innerHTML = '<span>●</span> Listening…';
+  } catch {
+    voiceNote.textContent = 'Microphone is already active. Please speak now.';
+  }
+}
+
 if (recognition) {
-  recognition.interimResults = false;
-  recognition.onresult = (event) => ask(event.results[0][0].transcript);
-  recognition.onend = () => { state.listening = false; micButton.classList.remove('listening'); voiceNote.textContent = 'Voice captured. Text mode is also available.'; };
-  recognition.onerror = () => { voiceNote.textContent = 'Microphone could not start. Please type your question instead.'; };
-} else voiceNote.textContent = 'Voice input is not supported in this browser. Text mode is ready.';
+  engineStatus.textContent = 'Ready — press Start';
+  recognition.interimResults = true;
+  recognition.continuous = false;
+  recognition.onresult = (event) => {
+    const transcript = Array.from(event.results).map((result) => result[0].transcript).join('');
+    input.value = transcript;
+    if (event.results[event.results.length - 1].isFinal) ask(transcript);
+  };
+  recognition.onend = () => {
+    state.listening = false;
+    micButton.classList.remove('listening');
+    startCallButton.innerHTML = '<span>●</span> Start Voice Demo';
+    if (callStatus.querySelector('strong').textContent === 'Listening…') setStatus('Ready — press again', false);
+  };
+  recognition.onerror = (event) => {
+    state.listening = false;
+    micButton.classList.remove('listening');
+    startCallButton.innerHTML = '<span>●</span> Start Voice Demo';
+    const denied = event.error === 'not-allowed' || event.error === 'service-not-allowed';
+    setStatus(denied ? 'Microphone blocked' : 'Please try again', false);
+    voiceNote.textContent = denied ? 'Click the lock icon near the address bar, allow Microphone, then try again.' : 'I could not hear that. Press Start Voice Demo and speak again.';
+  };
+} else {
+  engineStatus.textContent = 'Text mode available';
+  voiceNote.textContent = 'Voice input is not supported in this browser. Type your question below.';
+}
 
-micButton.addEventListener('click', () => {
-  if (!recognition) return input.focus();
-  state.listening = true; recognition.lang = state.language; recognition.start(); micButton.classList.add('listening'); voiceNote.textContent = 'Listening… ask your question now.';
-});
-
+startCallButton.addEventListener('click', startListening);
+micButton.addEventListener('click', startListening);
+repeatButton.addEventListener('click', () => { if (state.lastAnswer) speak(state.lastAnswer); });
 composer.addEventListener('submit', (event) => { event.preventDefault(); const message = input.value.trim(); if (message) ask(message); });
 quickPrompts.addEventListener('click', (event) => { if (event.target.matches('button')) ask(event.target.textContent); });
 
@@ -91,19 +163,27 @@ document.querySelector('#businessSelect').addEventListener('change', (event) => 
   state.businessId = event.target.value;
   const profile = businessProfiles[state.businessId];
   document.querySelector('#businessTitle').textContent = profile.name;
-  document.querySelector('#knowledgeList').innerHTML = profile.facts.map((fact) => `<li>${escapeHtml(fact)}</li>`).join('');
-  quickPrompts.innerHTML = profile.prompts.map((prompt) => `<button>${escapeHtml(prompt)}</button>`).join('');
-  addMessage('assistant', `${profile.name} profile loaded. How can I help?`);
+  document.querySelector('#knowledgeList').innerHTML = profile.facts.map((fact) => '<li>' + escapeHtml(fact) + '</li>').join('');
+  quickPrompts.innerHTML = profile.prompts.map((prompt) => '<button>' + escapeHtml(prompt) + '</button>').join('');
+  addMessage('assistant', profile.name + ' selected. Press Start Voice Demo and ask a question.');
 });
 
-document.querySelector('#languageSelect').addEventListener('change', (event) => { state.language = event.target.value; });
+document.querySelector('#languageSelect').addEventListener('change', (event) => {
+  state.language = event.target.value;
+  voiceNote.textContent = state.language === 'ur-PK' ? 'Roman Urdu mein bolain, misal: “Aap kab band hotay hain?”' : 'Tip: Ask “What time do you close?”';
+});
 document.querySelector('#themeButton').addEventListener('click', () => document.body.classList.toggle('light'));
 document.querySelector('#exportButton').addEventListener('click', () => {
   const blob = new Blob([JSON.stringify({ business: state.businessId, exportedAt: new Date().toISOString(), messages: state.messages }, null, 2)], { type: 'application/json' });
-  const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `voxa-transcript-${Date.now()}.json`; link.click(); URL.revokeObjectURL(link.href);
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'voxa-conversation-' + Date.now() + '.json';
+  link.click();
+  URL.revokeObjectURL(link.href);
 });
 
+if ('speechSynthesis' in window) speechSynthesis.getVoices();
 setInterval(() => {
   const seconds = Math.floor((Date.now() - state.startedAt) / 1000);
-  document.querySelector('#sessionTime').textContent = `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
+  document.querySelector('#sessionTime').textContent = String(Math.floor(seconds / 60)).padStart(2, '0') + ':' + String(seconds % 60).padStart(2, '0');
 }, 1000);
