@@ -1,68 +1,88 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#07111f" />
-    <meta name="description" content="A multilingual AI voice assistant demo for cafes, restaurants, real estate and small businesses." />
-    <link rel="icon" href="icon.svg" type="image/svg+xml" />
-    <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css" />
-    <title>Voxa — AI Voice Bot</title>
-  </head>
-  <body>
-    <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
-    <div class="app-shell">
-      <aside class="sidebar">
-        <a class="brand" href="#" aria-label="Voxa home"><span class="brand-mark">V</span><span>VOXA<small>VOICE OPERATING AGENT</small></span></a>
-        <nav aria-label="Main navigation">
-          <a class="nav-item active" href="#studio"><span>◈</span>Live Studio</a>
-          <a class="nav-item" href="#knowledge"><span>⌘</span>Knowledge</a>
-          <a class="nav-item" href="#insights"><span>◎</span>Insights</a>
-        </nav>
-        <div class="sidebar-card"><span class="live-dot"></span><strong>Demo ready</strong><p>Works without an API key. Connect OpenAI and Twilio when you are ready.</p></div>
-        <p class="sidebar-foot">Private-by-design starter<br />Built for real businesses</p>
-      </aside>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#07111f" />
+  <meta name="description" content="Try Voxa, a multilingual AI voice receptionist for cafés, restaurants, real estate and small businesses." />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .welcome-card{margin-bottom:16px;padding:22px 24px;border:1px solid rgba(94,232,255,.25);border-radius:20px;background:linear-gradient(135deg,rgba(94,232,255,.10),rgba(91,124,250,.08));box-shadow:var(--shadow)}
+    .welcome-card h2{margin:3px 0 8px;font:600 clamp(22px,3vw,32px)/1.1 "Space Grotesk",sans-serif}
+    .welcome-card>p{margin:0 0 18px;color:var(--muted);max-width:720px;line-height:1.55}
+    .how-it-works{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 18px;padding:0;list-style:none}
+    .how-it-works li{padding:12px;border:1px solid var(--line);border-radius:13px;background:rgba(3,9,16,.34);font-size:13px}
+    .how-it-works b{display:grid;place-items:center;width:25px;height:25px;margin-bottom:7px;border-radius:8px;background:rgba(94,232,255,.12);color:var(--cyan)}
+    .start-call{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:54px;padding:0 22px;border:0;border-radius:15px;background:linear-gradient(135deg,var(--cyan),var(--blue));color:#04101b;font-weight:800;font-size:16px;cursor:pointer;box-shadow:0 12px 35px rgba(91,124,250,.26)}
+    .start-call.listening{animation:pulse 1.2s infinite}
+    .call-status{display:inline-flex;align-items:center;gap:8px;margin-left:12px;color:var(--muted);font-size:13px}
+    .status-dot{width:9px;height:9px;border-radius:50%;background:var(--muted)}
+    .call-status.active .status-dot{background:var(--green);box-shadow:0 0 12px var(--green)}
+    .conversation-panel{min-height:560px}.conversation{min-height:280px}
+    .conversation-actions{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:8px 0 12px}
+    .repeat-button{border:1px solid var(--line);border-radius:10px;background:transparent;color:var(--muted);padding:8px 11px;cursor:pointer}
+    .repeat-button:hover{color:var(--cyan)}
+    @media(max-width:640px){.how-it-works{grid-template-columns:1fr}.start-call{width:100%}.call-status{display:flex;margin:12px 0 0}.welcome-card{padding:18px}.conversation-panel{min-height:540px}}
+  </style>
+  <title>Voxa — Talk to an AI Receptionist</title>
+</head>
+<body>
+  <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#" aria-label="Voxa home"><span class="brand-mark">V</span><span>VOXA<small>AI VOICE RECEPTIONIST</small></span></a>
+      <nav aria-label="Main navigation"><a class="nav-item active" href="#try"><span>◈</span>Try the bot</a><a class="nav-item" href="#knowledge"><span>⌘</span>What it knows</a><a class="nav-item" href="#insights"><span>◎</span>Conversation</a></nav>
+      <div class="sidebar-card"><span class="live-dot"></span><strong>Free browser demo</strong><p>Allow microphone access when Chrome asks. You can also type a question.</p></div>
+      <p class="sidebar-foot">No recording is stored<br />English and Urdu supported</p>
+    </aside>
 
-      <main>
-        <header class="topbar">
-          <div><p class="eyebrow">AI RECEPTIONIST / LIVE</p><h1>Voice command center</h1></div>
-          <div class="top-actions"><button class="icon-button" id="themeButton" aria-label="Toggle theme">◐</button><button class="export-button" id="exportButton">Export transcript</button></div>
-        </header>
+    <main>
+      <header class="topbar"><div><p class="eyebrow">AI RECEPTIONIST DEMO</p><h1>Talk to Voxa</h1></div><div class="top-actions"><button class="icon-button" id="themeButton" aria-label="Toggle theme">◐</button><button class="export-button" id="exportButton">Export conversation</button></div></header>
 
-        <section class="control-strip" id="studio">
-          <label><span>Business profile</span><select id="businessSelect"><option value="cafe">Northstar Café</option><option value="restaurant">Saffron Table</option><option value="realestate">Vertex Homes</option></select></label>
-          <label><span>Assistant language</span><select id="languageSelect"><option value="en-US">English</option><option value="ur-PK">Urdu / Roman Urdu</option></select></label>
-          <div class="connection"><span class="live-dot"></span><div><small>VOICE ENGINE</small><strong id="engineStatus">Browser ready</strong></div></div>
-        </section>
+      <section class="welcome-card" id="try">
+        <p class="eyebrow">CUSTOMER DEMO</p>
+        <h2>Ask a business question with your voice</h2>
+        <p>Choose a sample business, press the button and speak naturally. Voxa will show what it heard, answer on screen and read the answer aloud.</p>
+        <ol class="how-it-works"><li><b>1</b>Choose a business and language</li><li><b>2</b>Press Start Voice Demo and allow microphone</li><li><b>3</b>Ask: “What time do you close?”</li></ol>
+        <button class="start-call" id="startCallButton" type="button"><span>●</span> Start Voice Demo</button>
+        <span class="call-status" id="callStatus"><span class="status-dot"></span><strong>Ready to start</strong></span>
+      </section>
 
-        <section class="workspace-grid">
-          <article class="conversation-panel">
-            <div class="panel-head"><div><p class="eyebrow">LIVE CONVERSATION</p><h2 id="businessTitle">Northstar Café</h2></div><span class="session-pill" id="sessionTime">00:00</span></div>
-            <div class="conversation" id="conversation" aria-live="polite">
-              <div class="message assistant"><span>VOXA</span><p>Hello! I’m ready to answer calls, qualify leads and book appointments. Try the microphone or type a message.</p></div>
-            </div>
-            <div class="quick-prompts" id="quickPrompts"><button>What time do you close?</button><button>Can I book a table?</button><button>Where are you located?</button></div>
-            <form class="composer" id="composer">
-              <button class="mic-button" id="micButton" type="button" aria-label="Start voice input"><span class="mic-core">●</span><span class="mic-ring"></span></button>
-              <input id="messageInput" maxlength="800" placeholder="Speak or type a customer question…" autocomplete="off" />
-              <button class="send-button" type="submit">Send ↗</button>
-            </form>
-            <p class="voice-note" id="voiceNote">Microphone support depends on your browser. Text mode always works.</p>
-          </article>
+      <section class="control-strip">
+        <label><span>1. Choose business</span><select id="businessSelect"><option value="cafe">Northstar Café</option><option value="restaurant">Saffron Table</option><option value="realestate">Vertex Homes</option></select></label>
+        <label><span>2. Choose language</span><select id="languageSelect"><option value="en-US">English</option><option value="ur-PK">Urdu / Roman Urdu</option></select></label>
+        <div class="connection"><span class="live-dot"></span><div><small>MICROPHONE</small><strong id="engineStatus">Checking browser…</strong></div></div>
+      </section>
 
-          <aside class="right-rail">
-            <section class="metric-card" id="insights"><div><p>Conversations</p><strong id="conversationCount">0</strong></div><span class="metric-icon">↗</span></section>
-            <section class="intent-card"><p class="eyebrow">LIVE INTENT</p><strong id="intentValue">Waiting</strong><div class="confidence"><span id="confidenceBar"></span></div><small id="sourceValue">Local intelligence</small></section>
-            <section class="knowledge-card" id="knowledge"><div class="panel-head compact"><div><p class="eyebrow">KNOWLEDGE</p><h3>Verified facts</h3></div><span id="factCount">8</span></div><ul id="knowledgeList"><li>Business hours</li><li>Location and contact</li><li>Services and prices</li><li>Booking flow</li></ul></section>
-            <section class="privacy-card"><span>⌁</span><div><strong>Safe demo mode</strong><p>No recordings are stored. Add your own privacy policy before production calls.</p></div></section>
-          </aside>
-        </section>
-      </main>
-    </div>
-    <script type="module" src="app.js"></script>
-  </body>
+      <section class="workspace-grid">
+        <article class="conversation-panel">
+          <div class="panel-head"><div><p class="eyebrow">YOUR CONVERSATION</p><h2 id="businessTitle">Northstar Café</h2></div><span class="session-pill" id="sessionTime">00:00</span></div>
+          <div class="conversation" id="conversation" aria-live="polite">
+            <div class="message assistant"><span>VOXA</span><p>Welcome! Press “Start Voice Demo”, allow microphone access, then ask me about timings, location or booking.</p></div>
+          </div>
+          <div class="conversation-actions"><div class="quick-prompts" id="quickPrompts"><button>What time do you close?</button><button>Can I book a table?</button><button>Where are you located?</button></div><button class="repeat-button" id="repeatButton" type="button" disabled>↻ Repeat answer</button></div>
+          <form class="composer" id="composer">
+            <button class="mic-button" id="micButton" type="button" aria-label="Start voice input"><span class="mic-core">●</span><span class="mic-ring"></span></button>
+            <input id="messageInput" maxlength="800" placeholder="Or type your question here…" autocomplete="off" />
+            <button class="send-button" type="submit">Send ↗</button>
+          </form>
+          <p class="voice-note" id="voiceNote">Tip: Chrome works best. Speak after the status says “Listening”.</p>
+        </article>
+
+        <aside class="right-rail">
+          <section class="metric-card" id="insights"><div><p>Questions answered</p><strong id="conversationCount">0</strong></div><span class="metric-icon">↗</span></section>
+          <section class="intent-card"><p class="eyebrow">BOT STATUS</p><strong id="intentValue">Ready</strong><div class="confidence"><span id="confidenceBar"></span></div><small id="sourceValue">Waiting for your question</small></section>
+          <section class="knowledge-card" id="knowledge"><div class="panel-head compact"><div><p class="eyebrow">WHAT VOXA KNOWS</p><h3>Sample business facts</h3></div><span id="factCount">4</span></div><ul id="knowledgeList"><li>Open daily, 8 AM–11 PM</li><li>Main Boulevard, Karachi</li><li>Dine-in, takeaway & delivery</li><li>Reservations supported</li></ul></section>
+          <section class="privacy-card"><span>⌁</span><div><strong>Private demo</strong><p>Your voice is processed by the browser. This demo does not save audio recordings.</p></div></section>
+        </aside>
+      </section>
+    </main>
+  </div>
+  <script type="module" src="app.js"></script>
+</body>
 </html>
