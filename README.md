@@ -1,18 +1,21 @@
-# Voxa — AI Voice Bot
+# Voxa Business
 
-A production-ready starter for cafés, restaurants, real-estate agents and small businesses. The browser demo works without an API key; OpenAI and Twilio can be connected later for real phone calls.
+A multilingual AI receptionist and booking SaaS for salons and service businesses in Pakistan.
 
-## Highlights
+## What is included
 
-- Voice and text conversations with English and Urdu/Roman Urdu modes
-- Three switchable business profiles with grounded answers
-- Free local response engine with automatic OpenAI fallback
-- Twilio incoming-call webhooks and speech gathering
-- Conversation analytics, intent detection and transcript export
-- Responsive PWA-style interface, Docker support and automated tests
-- GitHub Pages demo plus Render/Railway-ready Node server
+- Secure business-owner registration and sign-in
+- PostgreSQL multi-tenant data model
+- Services and PKR pricing management
+- Customer booking pipeline with status tracking
+- English and Urdu/Roman Urdu voice demo
+- OpenAI response fallback and Twilio voice webhooks
+- Starter and Pro subscription request flow
+- Easypaisa/JazzCash payment verification requests
+- Responsive dashboard and guided customer demo
+- Rate limiting, secure cookies, password hashing and production headers
 
-## Quick start
+## Run locally
 
 ```bash
 npm install
@@ -20,26 +23,15 @@ cp .env.example .env
 npm start
 ```
 
-Open `http://localhost:3000`.
+Open `http://localhost:3000/dashboard.html`. PostgreSQL is required for live accounts. The dashboard includes an explicit demo mode for interface evaluation.
 
-## Connect OpenAI
+## Deploy on Render
 
-Add `OPENAI_API_KEY` to `.env`. Never place keys in frontend code or commit `.env`.
+The included `render.yaml` provisions the Node service and PostgreSQL database. Add `OPENAI_API_KEY` after deployment. Render generates `JWT_SECRET` and injects `DATABASE_URL`.
 
-## Connect Twilio
+## Required before selling
 
-1. Deploy the Node server to a public HTTPS URL.
-2. Set the Twilio phone number voice webhook to `POST https://YOUR-DOMAIN/api/twilio/voice`.
-3. Add `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` and `TWILIO_PHONE_NUMBER` to the host environment.
-4. Replace the sample business facts in `src/businesses.js` with verified information.
-
-## Production checklist
-
-- Add consent and call-recording notices required in your country.
-- Validate Twilio signatures and rate-limit public endpoints.
-- Use a database/CRM for bookings instead of treating a spoken request as confirmed.
-- Test Urdu voice availability with your selected speech provider.
-- Add monitoring and a human escalation number.
+Connect an official Meta WhatsApp Business number, configure the owner's verified payment account, replace sample business details, and add a human escalation contact.
 
 ## Test
 
@@ -48,6 +40,4 @@ npm run check
 npm test
 ```
 
-## License
-
-MIT
+MIT licensed.
