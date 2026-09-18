@@ -26,7 +26,7 @@
     .conversation-panel{min-height:560px}.conversation{min-height:280px}
     .conversation-actions{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:8px 0 12px}
     .repeat-button{border:1px solid var(--line);border-radius:10px;background:transparent;color:var(--muted);padding:8px 11px;cursor:pointer}
-    .repeat-button:hover{color:var(--cyan)}
+    .repeat-button:hover{color:var(--cyan)}\n    .dashboard-link{display:inline-flex;align-items:center;height:42px;padding:0 14px;border-radius:11px;background:linear-gradient(135deg,var(--cyan),var(--blue));color:#04101b;text-decoration:none;font-weight:800;font-size:12px}
     @media(max-width:640px){.how-it-works{grid-template-columns:1fr}.start-call{width:100%}.call-status{display:flex;margin:12px 0 0}.welcome-card{padding:18px}.conversation-panel{min-height:540px}}
   </style>
   <title>Voxa — Talk to an AI Receptionist</title>
@@ -42,7 +42,7 @@
     </aside>
 
     <main>
-      <header class="topbar"><div><p class="eyebrow">AI RECEPTIONIST DEMO</p><h1>Talk to Voxa</h1></div><div class="top-actions"><button class="icon-button" id="themeButton" aria-label="Toggle theme">◐</button><button class="export-button" id="exportButton">Export conversation</button></div></header>
+      <header class="topbar"><div><p class="eyebrow">AI RECEPTIONIST DEMO</p><h1>Talk to Voxa</h1></div><div class="top-actions"><a class="dashboard-link" href="dashboard.html">Open Business Dashboard</a><button class="icon-button" id="themeButton" aria-label="Toggle theme">◐</button><button class="export-button" id="exportButton">Export conversation</button></div></header>
 
       <section class="welcome-card" id="try">
         <p class="eyebrow">CUSTOMER DEMO</p>
