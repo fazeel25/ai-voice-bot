@@ -1,22 +1,26 @@
 {
-  "name": "ai-voice-bot",
-  "version": "1.0.0",
+  "name": "voxa-business",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
-  "description": "Production-ready multilingual AI voice assistant starter for cafes, restaurants, real estate teams and small businesses.",
+  "description": "Multilingual AI receptionist and booking SaaS for Pakistan's service businesses.",
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
     "test": "node --test",
-    "check": "node --check server.js && node --check src/assistant.js && node --check src/businesses.js && node --check public/app.js"
+    "check": "node --check server.js && node --check src/assistant.js && node --check src/businesses.js && node --check src/database.js && node --check public/app.js && node --check public/dashboard.js"
   },
-  "engines": {
-    "node": ">=20"
-  },
+  "engines": { "node": ">=20" },
   "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
     "openai": "^4.77.0",
+    "pg": "^8.13.1",
     "twilio": "^5.4.1"
   }
 }
